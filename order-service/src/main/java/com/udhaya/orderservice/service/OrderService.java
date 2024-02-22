@@ -7,6 +7,8 @@ import com.udhaya.orderservice.model.Order;
 import com.udhaya.orderservice.model.OrderLineItems;
 import com.udhaya.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,7 +23,8 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
+    private final DiscoveryClient discoveryClient;
 
     public void placeOrder(OrderRequest orderRequest) {
         if (orderRequest == null || orderRequest.getOrderLineItemsDtoList() == null) {
@@ -55,9 +58,11 @@ public class OrderService {
                 .map(OrderLineItems::getSkuCode)
                 .toList();
 
+        System.out.println("---------------------------------------------"+discoveryClient.getInstances("inventory-service").stream().map(ServiceInstance::getUri).findFirst()
+        );
         // Call Inventory Service, and place order if product is in stock
-        InventoryResponse[] inventoryResponseArray = webClient.get()
-                .uri("http://localhost:8082/api/inventory",
+        InventoryResponse[] inventoryResponseArray = webClientBuilder.build().get()
+                .uri("http://inventory-service/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)

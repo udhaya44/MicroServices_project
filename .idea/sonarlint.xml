@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SonarLintProjectSettings">
+    <option name="fileExclusions">
+      <list>
+        <option value="FILE:discovery-server.iml" />
+        <option value="FILE:discovery-server/src/main/java/com/programming/udhaya/discoveryserver/DiscoveryServerApplication.java" />
+      </list>
+    </option>
+  </component>
+</project>
